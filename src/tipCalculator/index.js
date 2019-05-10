@@ -51,12 +51,12 @@ class TipCalculator extends Component {
                 justify="center">
                 <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
                     <Paper style={{ padding: 20 }}>
-                        <TextField
+                        {/* <TextField
                             style={{ display: "block" }}
                             variant="outlined"
                             label="subtotal"
                             value={this.state.subTotal}
-                            onChange={this.onSubTotalChange} />
+                            onChange={this.onSubTotalChange} /> */}
                         <TextField
                             style={{ display: "block" }}
                             variant="outlined"
