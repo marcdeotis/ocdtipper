@@ -2,7 +2,7 @@
 
 :: ----------------------
 :: KUDU Deployment Script
-:: Version: 1.0.17
+:: Version: 1.0.15
 :: ----------------------
 
 :: Prerequisites
@@ -97,10 +97,27 @@ IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
 :: 2. Select node version
 call :SelectNodeVersion
 
+
 :: 3. Install npm packages
 IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
   pushd "%DEPLOYMENT_TARGET%"
-  call :ExecuteCmd !NPM_CMD! install --production
+  call :ExecuteCmd !NPM_CMD! install
+  IF !ERRORLEVEL! NEQ 0 goto error
+  popd
+)
+
+:: 4. Install client libraries
+IF EXIST "%DEPLOYMENT_TARGET%\client\package.json" (
+  pushd "%DEPLOYMENT_TARGET%\client"
+  call :ExecuteCmd !NPM_CMD! install
+  IF !ERRORLEVEL! NEQ 0 goto error
+  popd
+)
+
+:: 5. Build client
+IF EXIST "%DEPLOYMENT_TARGET%\node_modules" (
+  pushd "%DEPLOYMENT_TARGET%\client"
+  call .\node_modules\.bin\react-scripts.cmd build
   IF !ERRORLEVEL! NEQ 0 goto error
   popd
 )
