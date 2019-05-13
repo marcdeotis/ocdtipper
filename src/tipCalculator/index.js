@@ -19,31 +19,21 @@ class TipCalculator extends Component {
 
     moneyRegex = /^[0-9]{0,5}\.?([0-9]{1,2})?$/g;
 
-    // onSubTotalChange = (event) => {
-    //     const value = event.target.value;
-    //     this.moneyRegex.lastIndex = 0;
+    onSubTotalChange = (event) => {
+        const value = event.target.value;
+        this.moneyRegex.lastIndex = 0;
 
-    //     if (this.moneyRegex.test(value)) {
-    //         const { total, tipPercent } = this.state;
-    //         const tipAmount = Math.ceil(+total * (+tipPercent / 100) * 100) / 100;
-    //         const totalWithTip = +total + tipAmount;
-    //         const roundedTotal = Math.ceil(totalWithTip);
-
-    //         this.setState({ subTotal: value, totalWithTipRounded: roundedTotal });
-    //     }
-    // }
+        if (this.moneyRegex.test(value)) {
+            this.setState({ subTotal: value }, () => { this.calculateTip() });
+        }
+    }
 
     onTotalChange = (event) => {
         const value = event.target.value;
         this.moneyRegex.lastIndex = 0;
 
         if (this.moneyRegex.test(value)) {
-            const { tipPercent } = this.state;
-            const tipAmount = Math.ceil(+value * (+tipPercent / 100) * 100) / 100;
-            const totalWithTip = +value + tipAmount;
-            const roundedTotal = Math.ceil(totalWithTip);
-
-            this.setState({ total: value, totalWithTipRounded: roundedTotal });
+            this.setState({ total: value }, () => { this.calculateTip() });
         }
     }
 
@@ -65,14 +55,29 @@ class TipCalculator extends Component {
         }
     }
 
+    calculateTip = () => {
+        const { tipPercent, total, subTotal } = this.state;
+        const tipOnAmount = +subTotal !== 0 ? subTotal : total;
+        const tipAmount = Math.ceil(+tipOnAmount * (+tipPercent / 100) * 100) / 100;
+        const totalWithTip = +total + tipAmount;
+        const roundedTotal = Math.ceil(totalWithTip);
+
+        this.setState({ totalWithTipRounded: roundedTotal });
+    }
+
     roundedTipAmount = () => {
         const { total, totalWithTipRounded } = this.state;
         return totalWithTipRounded - +total;
     }
 
     roundedTotalTipPercentage = () => {
-        const { total, totalWithTipRounded } = this.state;
-        return Math.ceil((totalWithTipRounded / +total - 1) * 10000) / 100;
+        const { total, subTotal, totalWithTipRounded } = this.state;
+        if (+subTotal !== 0) {
+            const tipAmount = totalWithTipRounded - +total;
+            const subTotalWithTip = +subTotal + tipAmount;
+            return Math.ceil((subTotalWithTip / +subTotal - 1) * 10000) / 100;
+        }
+        return Math.ceil((totalWithTipRounded / +total - 1) * 10000) / 100
     }
 
     render() {
@@ -98,12 +103,12 @@ class TipCalculator extends Component {
                             <Grid container item xs={10} justify="center">
 
                                 <Grid item xs={10}>
-                                    {/* <TextField
+                                    <TextField
                                         style={{ display: "block" }}
                                         variant="outlined"
                                         label="subtotal"
                                         value={this.state.subTotal}
-                                        onChange={this.onSubTotalChange} /> */}
+                                        onChange={this.onSubTotalChange} />
                                     <TextField
                                         style={{ display: "block" }}
                                         variant="outlined"
