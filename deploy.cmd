@@ -88,17 +88,17 @@ goto :EOF
 :Deployment
 echo Handling node.js deployment.
 
-:: 1. KuduSync
+echo 1. KuduSync
 IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
   call :ExecuteCmd "%KUDU_SYNC_CMD%" -v 50 -f "%DEPLOYMENT_SOURCE%" -t "%DEPLOYMENT_TARGET%" -n "%NEXT_MANIFEST_PATH%" -p "%PREVIOUS_MANIFEST_PATH%" -i ".git;.hg;.deployment;deploy.cmd"
   IF !ERRORLEVEL! NEQ 0 goto error
 )
 
-:: 2. Select node version
+echo 2. Select node version
 call :SelectNodeVersion
 
 
-:: 3. Install npm packages
+echo 3. Install npm packages
 IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
   pushd "%DEPLOYMENT_TARGET%"
   call :ExecuteCmd !NPM_CMD! install
@@ -106,7 +106,7 @@ IF EXIST "%DEPLOYMENT_TARGET%\package.json" (
   popd
 )
 
-:: 4. Install client libraries
+echo 4. Install client libraries
 IF EXIST "%DEPLOYMENT_TARGET%\client\package.json" (
   pushd "%DEPLOYMENT_TARGET%\client"
   call :ExecuteCmd !NPM_CMD! install
@@ -114,7 +114,7 @@ IF EXIST "%DEPLOYMENT_TARGET%\client\package.json" (
   popd
 )
 
-:: 5. Build client
+echo 5. Build client
 IF EXIST "%DEPLOYMENT_TARGET%\node_modules" (
   pushd "%DEPLOYMENT_TARGET%\client"
   call .\node_modules\.bin\react-scripts.cmd build
